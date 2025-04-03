@@ -1,0 +1,2 @@
+[console_scripts]
+geopredictor = geopredictor.predictor:main

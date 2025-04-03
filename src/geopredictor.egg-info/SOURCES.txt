@@ -1,0 +1,10 @@
+README.md
+setup.py
+src/geopredictor/__init__.py
+src/geopredictor/predictor.py
+src/geopredictor.egg-info/PKG-INFO
+src/geopredictor.egg-info/SOURCES.txt
+src/geopredictor.egg-info/dependency_links.txt
+src/geopredictor.egg-info/entry_points.txt
+src/geopredictor.egg-info/requires.txt
+src/geopredictor.egg-info/top_level.txt
