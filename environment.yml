@@ -1,4 +1,4 @@
-name: geopredictor
+name: geopocket
 channels:
   - conda-forge
 dependencies:
