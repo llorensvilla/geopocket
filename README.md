@@ -1,6 +1,6 @@
-# Welcome to Geopocket
+# Welcome to Geopocket!
 
-GeoPocket is a geometry based binding site predictor that combines surface and cavity detection with residue interaction scoring. It relies on classical geometric detection algorithms to identify concave regions on protein surfaces (Simões et al., 2017) and complements them with interaction propensities derived from surface triplet analysis (Mehio et al., 2010). 
+GeoPocket is a geometry-Python based binding site predictor that combines surface and cavity detection with residue interaction scoring. It relies on classical geometric detection algorithms to identify concave regions on protein surfaces (Simões et al., 2017) and complements them with interaction propensities derived from surface triplet analysis (Mehio et al., 2010). 
 
 With a single command line invocation, Geopocket will:
 
