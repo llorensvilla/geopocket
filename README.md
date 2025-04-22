@@ -25,11 +25,11 @@ To clone the repository:
 ``cd geopocket ``
 
 
-3. Create the working environment with conda:
+2. Create the working environment with conda:
    ``conda env create -f environment.yml ``
   `` conda activate geopocket ``
 
-4. Install geopocket as a local package (using setup.py):
+3. Install geopocket as a local package (using setup.py):
 ``pip install . ``
 
 
