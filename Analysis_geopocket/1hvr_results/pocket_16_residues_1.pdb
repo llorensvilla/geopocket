@@ -1,0 +1,17 @@
+REMARK  Residues forming the pocket
+REMARK  CHAIN, RESNAME, RESNUM
+REMARK  A LYS 43
+REMARK
+ATOM      1  N  LYS A  43      -3.225  13.315  48.716  1.00  0.00
+ATOM      2  CA LYS A  43      -3.765  11.962  48.572  1.00  0.00
+ATOM      3  C  LYS A  43      -3.549  11.473  47.134  1.00  0.00
+ATOM      4  O  LYS A  43      -3.679  12.249  46.201  1.00  0.00
+ATOM      5  CB LYS A  43      -5.264  11.999  48.878  1.00  0.00
+ATOM      6  CG LYS A  43      -5.622  12.744  50.164  1.00  0.00
+ATOM      7  CD LYS A  43      -5.110  12.094  51.455  1.00  0.00
+ATOM      8  CE LYS A  43      -5.791  10.757  51.802  1.00  0.00
+ATOM      9  NZ LYS A  43      -5.366  10.319  53.141  1.00  0.00
+ATOM     10  H  LYS A  43      -3.588  14.070  48.164  1.00  0.00
+ATOM     11 HZ1 LYS A  43      -5.607  11.052  53.838  1.00  0.00
+ATOM     12 HZ2 LYS A  43      -5.847   9.432  53.389  1.00  0.00
+ATOM     13 HZ3 LYS A  43      -4.337  10.168  53.142  1.00  0.00

@@ -1,4 +1,7 @@
-# setup.py
+# This setup script uses setuptools to package the geopocket module.
+# It specifies the package name, version, and the directory where the source code is located.   
+# It also defines an entry point for a console script called 'geopocket' that runs the main function in the predictor module.
+
 from setuptools import setup, find_packages
 
 setup(
@@ -9,8 +12,6 @@ setup(
     entry_points={
         'console_scripts': [
             'geopocket = geopocket.predictor:main',
-            #                      ^ paquete     ^ archivo .py sin extensión
-            #                                    ^ función main() dentro de predictor.py
         ],
     },
     install_requires=[
@@ -20,4 +21,3 @@ setup(
     ],
     python_requires='>=3.8',
 )
-

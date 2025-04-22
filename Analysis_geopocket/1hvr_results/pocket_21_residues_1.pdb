@@ -1,0 +1,24 @@
+REMARK  Residues forming the pocket
+REMARK  CHAIN, RESNAME, RESNUM
+REMARK  A LEU 10
+REMARK  A GLU 21
+REMARK
+ATOM      1  N  LEU A  10      -5.587  30.070  26.850  1.00  0.00
+ATOM      2  CA LEU A  10      -4.573  29.932  27.892  1.00  0.00
+ATOM      3  C  LEU A  10      -4.515  31.109  28.780  1.00  0.00
+ATOM      4  O  LEU A  10      -4.677  32.228  28.318  1.00  0.00
+ATOM      5  CB LEU A  10      -3.202  29.954  27.285  1.00  0.00
+ATOM      6  CG LEU A  10      -2.781  28.744  26.503  1.00  0.00
+ATOM      7 CD1 LEU A  10      -1.439  29.103  25.866  1.00  0.00
+ATOM      8 CD2 LEU A  10      -2.698  27.496  27.399  1.00  0.00
+ATOM      9  H  LEU A  10      -5.431  30.673  26.068  1.00  0.00
+ATOM     10  N  GLU A  21       1.387  28.765  32.841  1.00  0.00
+ATOM     11  CA GLU A  21       0.152  29.063  32.090  1.00  0.00
+ATOM     12  C  GLU A  21      -0.657  27.774  32.038  1.00  0.00
+ATOM     13  O  GLU A  21      -0.119  26.668  32.171  1.00  0.00
+ATOM     14  CB GLU A  21       0.351  29.552  30.641  1.00  0.00
+ATOM     15  CG GLU A  21       1.333  30.668  30.361  1.00  0.00
+ATOM     16  CD GLU A  21       1.377  30.937  28.856  1.00  0.00
+ATOM     17 OE1 GLU A  21       0.435  31.577  28.387  1.00  0.00
+ATOM     18 OE2 GLU A  21       2.340  30.539  28.159  1.00  0.00
+ATOM     19  H  GLU A  21       1.995  28.010  32.588  1.00  0.00

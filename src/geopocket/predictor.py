@@ -7,6 +7,7 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 from scipy.spatial import ConvexHull
 from sklearn.cluster import DBSCAN
+import argparse
 
 ########################################################################
 # 1) Main Class: GeoPredictor
@@ -42,14 +43,37 @@ class GeoPredictor:
         (0.1) Initialization and file check.
         Checks if the input PDB file exists and sets initial parameters.
         Copies the original PDB file into an output folder named after the protein.
+
+         Parameters
+        ----------
+        *pdb_file : str
+            Path to input PDB.
+        *grid_spacing : float
+            Initial voxel size; auto adjusted by protein size.
+        *dog_threshold_percentile : float
+            Percentile cutoff on DoG filtered grid.
+        *eps : float
+            DBSCAN neighbourhood radius.
+        *min_samples : int
+            Minimum DBSCAN cluster size.
+        *residue_distance : float
+            Distance cutoff (Å) to assign residues to a pocket.
+        *geometric_weight : float
+            Weight for geometric scoring.
+        *interaction_weight : float
+            Weight for interaction scoring.
+        *interaction_weights : dict
+            Per interaction type weights.
+        *verbose : bool
+            If True, print progress details.
         """
         if not os.path.isfile(pdb_file):
             raise FileNotFoundError(f"Input PDB file '{pdb_file}' not found.")
         self.pdb_file = pdb_file
-        self.grid_spacing = grid_spacing           # Initial value; will be updated dynamically.
-        self.dog_threshold_percentile = dog_threshold_percentile  # Initial value; updated dynamically.
-        self.eps = eps                             # Fixed DBSCAN eps value (0.8).
-        self.min_samples = min_samples             # Fixed DBSCAN min_samples value (5).
+        self.grid_spacing = grid_spacing          
+        self.dog_threshold_percentile = dog_threshold_percentile  
+        self.eps = eps                             
+        self.min_samples = min_samples             
         self.residue_distance = residue_distance
         self.geometric_weight = geometric_weight
         self.interaction_weight = interaction_weight
@@ -124,10 +148,8 @@ class GeoPredictor:
         self.print_progress(current_step, TOTAL_STEPS, start_time, step_name)
 
         # === Step 6: Cluster Candidate Points using DBSCAN (Fixed Parameters) ===
-        eps_val = 0.8
-        min_samples_val = 5
-        print(f"Using DBSCAN parameters: eps = {eps_val:.2f}, min_samples = {min_samples_val}")
-        pocket_clusters = self.cluster_pockets(pocket_candidates, protein_coords, eps=eps_val, min_samples=min_samples_val)
+        print(f"Using DBSCAN parameters: eps = {self.eps:.2f}, min_samples = {self.min_samples}")
+        pocket_clusters = self.cluster_pockets(pocket_candidates, protein_coords, eps=self.eps, min_samples=self.min_samples)
         if len(pocket_clusters) == 0:
             raise ValueError("Clustering resulted in no significant pockets.")
         current_step += 1
@@ -135,23 +157,32 @@ class GeoPredictor:
 
         # === Step 7: Evaluate Binding Site Quality and Compute CompositeScore ===
         for pocket in pocket_clusters:
-            interaction_score = self.evaluate_binding_site_score(protein_atoms, pocket, distance_threshold=self.residue_distance, interaction_weights=self.interaction_weights)
+            interaction_score = self.evaluate_binding_site_score(
+                protein_atoms, pocket,
+                distance_threshold=self.residue_distance,
+                interaction_weights=self.interaction_weights
+            )
             composite_score = (self.geometric_weight * pocket['dogsite_score'] +
                                self.interaction_weight * interaction_score)
             pocket['interaction_score'] = interaction_score
-            pocket['composite_score'] = composite_score
+            pocket['composite_score']  = composite_score
 
         # === Step 8: Save Predicted Pockets and Generate Visualization Scripts ===
         step_name = "Saving Pockets and Residues"
-        pockets_pdb = self.get_unique_filename(self.output_folder, "predicted_pockets", "pdb")
-        pymol_script = self.get_unique_filename(self.output_folder, "visualize_pockets", "pml")
+        pockets_pdb    = self.get_unique_filename(self.output_folder, "predicted_pockets", "pdb")
+        pymol_script   = self.get_unique_filename(self.output_folder, "visualize_pockets", "pml")
         chimera_script = self.get_unique_filename(self.output_folder, "visualize_pockets", "cmd")
         self.save_pockets_as_pdb(pocket_clusters, pockets_pdb)
         print(f"✅ Pocket centroids saved as {pockets_pdb}")
         pocket_residues_list = []
         for i, pocket in enumerate(pocket_clusters, start=1):
-            residues = self.find_residues_in_pocket(protein_atoms, pocket['centroid'], distance_threshold=self.residue_distance)
-            pocket_residues_pdb = self.get_unique_filename(self.output_folder, f"pocket_{i}_residues", "pdb")
+            residues = self.find_residues_in_pocket(
+                protein_atoms, pocket['centroid'],
+                distance_threshold=self.residue_distance
+            )
+            pocket_residues_pdb = self.get_unique_filename(
+                self.output_folder, f"pocket_{i}_residues", "pdb"
+            )
             self.save_residues_as_pdb(protein_atoms, residues, pocket_residues_pdb)
             pocket_residues_list.append(pocket_residues_pdb)
             print(f"   Pocket {i} residues saved in: {pocket_residues_pdb}")
@@ -160,8 +191,8 @@ class GeoPredictor:
 
         # === Step 9: Generate Visualization Scripts for PyMOL and Chimera ===
         step_name = "Generating Visualization Scripts"
-        local_pdb_path = os.path.abspath(self.local_pdb)
-        pockets_pdb_path = os.path.abspath(pockets_pdb)
+        local_pdb_path       = os.path.abspath(self.local_pdb)
+        pockets_pdb_path     = os.path.abspath(pockets_pdb)
         pocket_residues_paths = [os.path.abspath(x) for x in pocket_residues_list]
         self.generate_pymol_script(local_pdb_path, pockets_pdb_path, pocket_residues_paths, pymol_script)
         print(f"✅ PyMOL script saved as {pymol_script}")
@@ -545,25 +576,46 @@ class GeoPredictor:
             raise IOError(f"Error writing Chimera script: {e}")
 
 ########################################################################
-# 2) Main Execution
+# 2) Main Execution with argparse
 ########################################################################
 def main():
-    """
-    Main function to instantiate and run the GeoPredictor.
-    """
-    if len(sys.argv) < 2:
-        sys.exit("Usage: python3 detect_pockets_fusion_sam.py <protein_file.pdb>")
-    input_pdb_filename = sys.argv[1]
+    parser = argparse.ArgumentParser(
+        description="GeoPredictor: detect protein binding-site pockets."
+    )
+    parser.add_argument(
+        "pdb_file",
+        help="Input PDB filename"
+    )
+    parser.add_argument(
+        "-t", "--threshold",
+        type=float,
+        default=95.0,
+        help="DoG filter percentile cutoff (default: 95)"
+    )
+    parser.add_argument(
+        "-e", "--eps",
+        type=float,
+        default=0.8,
+        help="DBSCAN eps (neighborhood radius in Å, default: 0.8)"
+    )
+    parser.add_argument(
+        "-m", "--min-samples",
+        type=int,
+        default=5,
+        help="DBSCAN min_samples (default: 5)"
+    )
+    args = parser.parse_args()
+
     try:
         predictor = GeoPredictor(
-            pdb_file=input_pdb_filename,
-            grid_spacing=0.5,            # Initial value; updated dynamically.
-            dog_threshold_percentile=95, # Initial value; updated dynamically.
-            eps=0.8,                     # Fixed DBSCAN eps value.
-            min_samples=5,               # Fixed DBSCAN min_samples value.
+            pdb_file=args.pdb_file,
+            grid_spacing=0.5,
+            dog_threshold_percentile=args.threshold,
+            eps=args.eps,
+            min_samples=args.min_samples,
             residue_distance=5.0,
-            geometric_weight=0.5,        # Weight for geometric score.
-            interaction_weight=0.5,      # Weight for interaction score.
+            geometric_weight=0.5,
+            interaction_weight=0.5,
             interaction_weights={
                 "hbond": 0.25,
                 "ionic": 0.25,
